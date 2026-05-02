@@ -1,0 +1,117 @@
+/* ===== 인증 오버레이 ===== */
+.authOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+}
+
+.authOverlay[hidden] {
+  display: none !important;
+}
+
+.authOverlayBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(48, 44, 38, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.authCard {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 380px;
+  max-height: min(90vh, 640px);
+  overflow: auto;
+  padding: 28px 24px 24px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.authBrand {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.authBrandTitle {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.authBrandSub {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.authTabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.authTab {
+  flex: 1;
+  padding: 10px 0;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.authTab:hover {
+  color: var(--text);
+}
+
+.authTabActive {
+  color: var(--text);
+  font-weight: 600;
+  border-bottom-color: var(--accent-strong);
+}
+
+.authTab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.authForm[hidden] {
+  display: none !important;
+}
+
+.authError {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  font-size: 0.8125rem;
+  color: #b91c1c;
+  background: rgba(254, 226, 226, 0.9);
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  border-radius: var(--radius-sm);
+  line-height: 1.45;
+}
+
+.authError[hidden] {
+  display: none !important;
+}

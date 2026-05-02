@@ -1,0 +1,47 @@
+.pageTabs {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px 20px;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
+.pageTabsButton {
+  flex: 0 0 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 4px 0;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: left;
+  box-shadow: none;
+  transition: color 0.2s;
+}
+
+.pageTabsButton:hover {
+  color: var(--text);
+}
+
+.pageTabsButtonActive {
+  color: var(--text);
+  font-weight: 600;
+  background: transparent;
+  box-shadow: none;
+}
+
+.pageTabsButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}

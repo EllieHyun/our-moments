@@ -1,0 +1,104 @@
+/* ===== 커플 연결 모달 ===== */
+.coupleModalDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.coupleModalDividerBefore,
+.coupleModalDividerAfter {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-soft);
+}
+
+.inviteCodeBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+}
+
+.inviteCodeBoxCode {
+  flex: 1;
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.08em;
+}
+
+.btnCopy {
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.btnCopy:hover {
+  background: var(--bg-deep);
+}
+
+.btnCopy:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.coupleConnectedInfo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: rgba(220, 160, 180, 0.1);
+  border: 1px solid rgba(200, 120, 150, 0.2);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+}
+
+.coupleConnectedInfoAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #c084a0;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.coupleConnectedInfoAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.coupleConnectedInfoName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.coupleConnectedInfoLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+}

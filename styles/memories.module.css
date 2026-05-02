@@ -1,0 +1,143 @@
+.memoriesViewToggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.memoriesViewBtn {
+  flex: 1;
+  padding: 7px 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.memoriesViewBtnActive {
+  background: var(--accent-strong);
+  color: #fff;
+  border-color: var(--accent-strong);
+}
+
+.memoriesList {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  width: 100%;
+  max-width: 400px;
+  text-align: left;
+}
+
+.memoriesList:empty {
+  margin-top: 12px;
+}
+
+.memoriesTimeline {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.memoriesTimelineGroup {
+  margin-bottom: 28px;
+}
+
+.memoriesTimelineDate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.memoriesTimelineDateLabel {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.memoriesTimelineDateLine {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.memoriesTimelineItems {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.memoriesTimelineItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+}
+
+.memoriesTimelineItemThumb {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  background: var(--bg-deep);
+}
+
+.memoriesTimelineItemThumbEmpty {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.memoriesTimelineItemBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.memoriesTimelineItemPlace {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memoriesTimelineItemMemo {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memoriesEmptyHint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+#panelMemories {
+  overflow-y: auto;
+}

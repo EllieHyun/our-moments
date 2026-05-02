@@ -1,0 +1,291 @@
+#panelMap {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mapStage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+
+.mapSearch {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: auto;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(520px, calc(100% - 28px));
+  max-width: 520px;
+  margin: 0;
+  padding: 11px 18px;
+  background: #ffffff;
+  border: 1px solid rgba(88, 78, 64, 0.08);
+  border-radius: 999px;
+  box-shadow: 0 2px 14px rgba(45, 40, 32, 0.08);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.mapSearch:focus-within {
+  border-color: rgba(88, 78, 64, 0.16);
+  box-shadow: 0 4px 20px rgba(45, 40, 32, 0.1);
+}
+
+.mapSearchIcon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+}
+
+.mapSearchInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.mapSearchInput::placeholder {
+  color: var(--text-muted);
+  opacity: 0.9;
+}
+
+#map {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.mapWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg-card);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  overflow: hidden;
+}
+
+.mapError {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 14px 16px;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: #b91c1c;
+  background: rgba(254, 226, 226, 0.95);
+  border-top: 1px solid rgba(248, 113, 113, 0.28);
+}
+
+.geoStatus {
+  margin: 0 0 12px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.recentRecords {
+  position: absolute;
+  bottom: 24px;
+  left: 14px;
+  z-index: 20;
+  width: min(280px, calc(100% - 28px));
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(88, 78, 64, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 24px rgba(45, 40, 32, 0.1);
+}
+
+.recentRecordsTitle {
+  margin: 0 0 12px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.recentRecordsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recentRecordItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.recentRecordItemThumb {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  background: var(--bg-deep);
+}
+
+.recentRecordItemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.recentRecordItem:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.recentRecordItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.recentRecordItemPlace {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recentRecordItemDate {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.recentRecordItemMemo {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.recentRecordsEmpty {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.btnNewRecord {
+  position: fixed;
+  z-index: 50;
+  bottom: max(20px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+  right: max(50px, calc(env(safe-area-inset-right, 0px) + 16px));
+  padding: 12px 20px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #faf8f4;
+  background: var(--accent-strong);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btnNewRecord:hover {
+  transform: translateY(-1px);
+  background: #3d3a36;
+  box-shadow: 0 6px 24px rgba(45, 40, 32, 0.12);
+}
+
+.btnNewRecord:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.btnNewRecord:active {
+  transform: translateY(0);
+}
+
+body.record-modal-open {
+  overflow: hidden;
+}
+
+/* ===== 검색 자동완성 드롭다운 ===== */
+.mapSearchDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid rgba(88, 78, 64, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(45, 40, 32, 0.12);
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.mapSearchDropdown[hidden] {
+  display: none !important;
+}
+
+.mapSearchDropdownItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.mapSearchDropdownItem:hover {
+  background: var(--accent-soft, #f5f1ea);
+}
+
+.mapSearchDropdownTitle {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.mapSearchDropdownDate {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}

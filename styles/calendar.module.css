@@ -1,0 +1,164 @@
+/* ===== 캘린더 뷰 ===== */
+.memoriesCalendar {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 12px;
+}
+
+.memoriesCalendarNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.memoriesCalendarNavBtn {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+}
+
+.memoriesCalendarNavBtn:hover {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.memoriesCalendarMonthLabel {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.memoriesCalendarWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+
+.memoriesCalendarWeekday {
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+.memoriesCalendarWeekdayFirst {
+  color: #c0524a;
+}
+
+.memoriesCalendarWeekdayLast {
+  color: #4a6ab0;
+}
+
+.memoriesCalendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.memoriesCalendarDay {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  border-radius: var(--radius-sm);
+  cursor: default;
+  position: relative;
+  color: var(--text);
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.memoriesCalendarDayOtherMonth {
+  color: var(--text-muted);
+  opacity: 0.3;
+}
+
+.memoriesCalendarDayTodayNum {
+  font-weight: 700;
+  background: var(--accent-soft);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memoriesCalendarDaySun {
+  color: #c0524a;
+}
+
+.memoriesCalendarDaySat {
+  color: #4a6ab0;
+}
+
+.memoriesCalendarDayHasRecords {
+  cursor: pointer;
+}
+
+.memoriesCalendarDayHasRecords:hover {
+  background: var(--accent-glow);
+}
+
+.memoriesCalendarDaySelected {
+  background: var(--accent-strong) !important;
+  color: #faf8f4 !important;
+  border-radius: var(--radius-sm);
+}
+
+.memoriesCalendarDaySelectedNum {
+  background: transparent !important;
+  color: #faf8f4;
+}
+
+.memoriesCalendarDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-strong);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.memoriesCalendarDaySelectedDot {
+  background: rgba(250, 248, 244, 0.7);
+}
+
+.memoriesCalendarDayNum {
+  font-size: 0.8125rem;
+  line-height: 1;
+}
+
+.memoriesCalendarRecords {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.memoriesCalendarRecordsTitle {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.memoriesCalendarRecordsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
