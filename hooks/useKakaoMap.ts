@@ -28,6 +28,7 @@ export function useKakaoMap(containerRef: React.RefObject<HTMLDivElement | null>
               level: 3,
               draggable: true,
               scrollwheel: true,
+              disableDoubleClickZoom: false,
             })
 
             mapRef.current = map

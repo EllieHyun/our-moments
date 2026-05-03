@@ -12,44 +12,43 @@ export default function CardView({ records }: CardViewProps) {
   const { openPinDetail } = useUI()
 
   if (records.length === 0) {
-    return <div className={styles.cardViewEmpty}>기록이 없습니다.</div>
+    return <p className={styles.memoriesEmptyHint}>기록이 없습니다.</p>
   }
 
   return (
-    <div className={styles.cardViewContainer}>
-      {records.map((record) => (
-        <div key={record.id} className={styles.recordCard}>
-          <div className={styles.recordCardHeader}>
-            <h3 className={styles.recordCardTitle}>{record.title}</h3>
-            <span className={styles.recordCardDate}>{record.date}</span>
-          </div>
+    <ul className={styles.memoriesList}>
+      {records.map((record) => {
+        const firstStop = record.stops[0]
+        const thumb = firstStop?.photoDataUrl
+        const label = record.title || firstStop?.placeTag || '기록'
+        const desc = firstStop?.memo || ''
 
-          <div className={styles.recordCardStops}>
-            {record.stops.map((stop) => (
-              <div key={stop.id} className={styles.recordCardStop}>
-                <div className={styles.recordCardStopTime}>{stop.time}</div>
-                <div className={styles.recordCardStopPlace}>{stop.placeTag}</div>
-              </div>
-            ))}
-          </div>
-
-          {record.weather && (
-            <div className={styles.recordCardWeather}>
-              <span>{record.weather.emoji}</span>
-              <span>{record.weather.description}</span>
-            </div>
-          )}
-
-          <button
-            className={styles.recordCardBtn}
-            onClick={() => {
-              // TODO: 기록의 첫 번째 stop pinId로 openPinDetail 호출
-            }}
+        return (
+          <li
+            key={record.id}
+            className={styles.memoriesTimelineItem}
+            style={{ marginBottom: 12, cursor: 'pointer', listStyle: 'none' }}
+            onClick={() => openPinDetail(record.id)}
           >
-            보기
-          </button>
-        </div>
-      ))}
-    </div>
+            {thumb ? (
+              <img
+                className={styles.memoriesTimelineItemThumb}
+                src={thumb}
+                alt="기록 사진"
+              />
+            ) : (
+              <div className={styles.memoriesTimelineItemThumbEmpty}>📍</div>
+            )}
+            <div className={styles.memoriesTimelineItemBody}>
+              <div className={styles.memoriesTimelineItemPlace}>{label}</div>
+              <div className={styles.memoriesTimelineItemMemo}>{record.date}</div>
+              {desc && (
+                <div className={styles.memoriesTimelineItemMemo}>{desc}</div>
+              )}
+            </div>
+          </li>
+        )
+      })}
+    </ul>
   )
 }
