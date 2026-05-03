@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { signUp, signIn } from '@/app/actions/auth'
+import { signUp } from '@/app/actions/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import styles from '@/styles/auth.module.css'
 
@@ -12,7 +12,7 @@ interface AuthOverlayProps {
 }
 
 export function AuthOverlay({ hidden = false }: AuthOverlayProps) {
-  const { user } = useAuth()
+  const { user, signIn } = useAuth()
   const [mode, setMode] = useState<AuthMode>('login')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -39,6 +39,7 @@ export function AuthOverlay({ hidden = false }: AuthOverlayProps) {
     try {
       if (mode === 'login') {
         const result = await signIn(formData.email, formData.password)
+        console.log("result : " + JSON.stringify(result))
         if (result.error) {
           setError(result.error)
         }
@@ -47,7 +48,6 @@ export function AuthOverlay({ hidden = false }: AuthOverlayProps) {
         if (result.error) {
           setError(result.error)
         } else {
-          setError('이메일 인증 링크가 발송되었습니다.')
           setFormData({ email: '', password: '', nickname: '' })
           setMode('login')
         }
@@ -91,12 +91,12 @@ export function AuthOverlay({ hidden = false }: AuthOverlayProps) {
         {error && <div className={styles.authError}>{error}</div>}
 
         <form className={styles.authForm} onSubmit={handleSubmit}>
-          <div className={styles.recordFormField}>
-            <label className={styles.recordFormLabel} htmlFor="email">
+          <div className={styles.authFormField}>
+            <label className={styles.authFormLabel} htmlFor="email">
               이메일
             </label>
             <input
-              className={styles.recordFormInput}
+              className={styles.authFormInput}
               type="email"
               id="email"
               name="email"
@@ -109,12 +109,12 @@ export function AuthOverlay({ hidden = false }: AuthOverlayProps) {
           </div>
 
           {mode === 'signup' && (
-            <div className={styles.recordFormField}>
-              <label className={styles.recordFormLabel} htmlFor="nickname">
+            <div className={styles.authFormField}>
+              <label className={styles.authFormLabel} htmlFor="nickname">
                 닉네임
               </label>
               <input
-                className={styles.recordFormInput}
+                className={styles.authFormInput}
                 type="text"
                 id="nickname"
                 name="nickname"
@@ -127,12 +127,12 @@ export function AuthOverlay({ hidden = false }: AuthOverlayProps) {
             </div>
           )}
 
-          <div className={styles.recordFormField}>
-            <label className={styles.recordFormLabel} htmlFor="password">
+          <div className={styles.authFormField}>
+            <label className={styles.authFormLabel} htmlFor="password">
               비밀번호
             </label>
             <input
-              className={styles.recordFormInput}
+              className={styles.authFormInput}
               type="password"
               id="password"
               name="password"
@@ -144,10 +144,10 @@ export function AuthOverlay({ hidden = false }: AuthOverlayProps) {
             />
           </div>
 
-          <div className={styles.recordFormActions}>
+          <div className={styles.authFormActions}>
             <button
               type="submit"
-              className={styles.recordFormBtnPrimary}
+              className={styles.authFormBtnPrimary}
               disabled={loading}
             >
               {loading

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { signIn as serverSignIn } from '@/app/actions/auth'
 import type { UserProfile, Session } from '@/types/index'
 
 interface AuthContextType {
@@ -9,6 +10,7 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   error: string | null
+  signIn: (email: string, password: string) => Promise<{ error?: string }>
   signOut: () => Promise<void>
 }
 
@@ -60,18 +62,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 인증 상태 변경 구독
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = supabase.auth.onAuthStateChange(async (_event: any, currentSession: any) => {
       if (currentSession) {
         setSession(currentSession as Session)
 
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', currentSession.user.id)
-          .single()
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', currentSession.user.id)
+            .single()
 
-        if (profile) {
-          setUser(profile)
+          if (profileError) {
+            console.error('프로필 조회 오류:', profileError)
+            // 프로필이 없으면 자동 생성
+            const { error: insertError } = await supabase.from('users').insert({
+              id: currentSession.user.id,
+              email: currentSession.user.email,
+              nickname: currentSession.user.user_metadata?.nickname || 'User',
+              avatar_url: null,
+              created_at: new Date().toISOString(),
+            })
+
+            if (insertError) {
+              console.error('프로필 자동 생성 실패:', insertError)
+              return
+            }
+
+            // 프로필 재조회
+            const { data: newProfile } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', currentSession.user.id)
+              .single()
+
+            if (newProfile) {
+              setUser(newProfile)
+            }
+          } else if (profile) {
+            console.log('로그인 프로필:', JSON.stringify(profile))
+            setUser(profile)
+          }
+        } catch (err) {
+          console.error('프로필 처리 예외:', err)
         }
       } else {
         setSession(null)
@@ -84,6 +118,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  const signIn = async (email: string, password: string): Promise<{ error?: string }> => {
+    console.log('signIn 시작:', email)
+
+    try {
+      // 서버 액션으로 로그인 + 프로필 조회 수행
+      const result = await serverSignIn(email, password)
+
+      if (result.error) {
+        console.error('signIn 오류:', result.error)
+        return { error: result.error }
+      }
+
+      console.log('signIn 성공')
+
+      // 서버에서 받은 session과 profile 설정
+      const currentSession = result.data?.session
+      const profile = result.profile
+
+      if (!currentSession) {
+        return { error: '로그인 실패' }
+      }
+
+      setSession(currentSession as Session)
+
+      if (profile) {
+        console.log('프로필 설정 완료')
+        setUser(profile)
+      }
+
+      return {}
+    } catch (err) {
+      console.error('signIn 예외:', err)
+      return { error: err instanceof Error ? err.message : '알 수 없는 오류' }
+    }
+  }
+
   const signOut = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
@@ -92,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, error, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, error, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )

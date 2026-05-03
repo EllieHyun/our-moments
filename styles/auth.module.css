@@ -115,3 +115,75 @@
 .authError[hidden] {
   display: none !important;
 }
+
+.authFormField {
+  margin-bottom: 20px;
+}
+
+.authFormLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  letter-spacing: -0.01em;
+}
+
+.authFormInput {
+  width: 100%;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text, #1e293b);
+  background: var(--bg-surface, #f8fafc);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  border-radius: 12px;
+  transition: all 0.2s ease-in-out;
+}
+
+.authFormInput::placeholder {
+  color: #94a3b8;
+}
+
+.authFormInput:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: var(--accent-strong, #3b82f6);
+  box-shadow: 0 0 0 4px var(--accent-soft, rgba(59, 130, 246, 0.15));
+}
+
+.authFormActions {
+  margin-top: 32px;
+}
+
+.authFormBtnPrimary {
+  width: 100%;
+  padding: 16px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--accent-strong, #3b82f6);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px var(--accent-soft, rgba(59, 130, 246, 0.25));
+}
+
+.authFormBtnPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px var(--accent-soft, rgba(59, 130, 246, 0.35));
+}
+
+.authFormBtnPrimary:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px var(--accent-soft, rgba(59, 130, 246, 0.2));
+}
+
+.authFormBtnPrimary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

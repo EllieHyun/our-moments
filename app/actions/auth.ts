@@ -18,7 +18,12 @@ export async function signUp(email: string, password: string, nickname: string) 
     })
 
     if (authError) {
-      return { error: authError.message }
+      // 에러 메시지 한글화
+      let errorMessage = authError.message
+      if (errorMessage.includes('already registered')) {
+        errorMessage = '이미 가입된 계정이 존재합니다.'
+      }
+      return { error: errorMessage }
     }
 
     if (!authData.user) {
@@ -36,7 +41,7 @@ export async function signUp(email: string, password: string, nickname: string) 
 
     if (profileError) {
       console.error('프로필 저장 오류:', profileError)
-      // 프로필 저장 실패해도 인증은 성공했으므로 계속 진행
+      return { error: `프로필 저장 실패: ${profileError.message}` }
     }
 
     return { success: true, data: authData.user }
@@ -56,10 +61,47 @@ export async function signIn(email: string, password: string) {
     })
 
     if (error) {
-      return { error: error.message }
+      let errorMessage = error.message
+      if (errorMessage.includes('Invalid login credentials')) {
+        errorMessage = '이메일 또는 비밀번호가 잘못되었습니다.'
+      }
+      return { error: errorMessage }
     }
 
-    return { success: true, data }
+    // 프로필 조회
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', data.user?.id)
+      .single()
+
+    if (profileError) {
+      console.error('프로필 조회 오류:', profileError)
+      // 프로필이 없으면 자동 생성
+      const { error: insertError } = await supabase.from('users').insert({
+        id: data.user?.id,
+        email: data.user?.email,
+        nickname: data.user?.user_metadata?.nickname || 'User',
+        avatar_url: null,
+        created_at: new Date().toISOString(),
+      })
+
+      if (insertError) {
+        console.error('프로필 생성 오류:', insertError)
+        return { error: '프로필 생성 실패' }
+      }
+
+      // 재조회
+      const { data: newProfile } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user?.id)
+        .single()
+
+      return { success: true, data, profile: newProfile }
+    }
+
+    return { success: true, data, profile }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류'
     return { error: errorMessage }
