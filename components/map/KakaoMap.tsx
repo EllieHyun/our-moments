@@ -1,19 +1,16 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
+import { useEffect, useRef } from 'react'
 import { useMap } from '@/contexts/MapContext'
 import { useUI } from '@/contexts/UIContext'
 import { useKakaoMap } from '@/hooks/useKakaoMap'
 import styles from '@/styles/map.module.css'
 
 export default function KakaoMap() {
-  const { user } = useAuth()
-  const { mapRef, loadPins, pins, setPins } = useMap()
-  const { openPinDetail } = useUI()
+  const { mapRef } = useMap()
+  const { activeTab } = useUI()
   const containerRef = useRef<HTMLDivElement>(null)
   const { mapRef: newMapRef, isLoaded, error } = useKakaoMap(containerRef)
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null)
   const markerRef = useRef<any>(null)
 
   // mapRef에 새 참조 할당
@@ -23,12 +20,12 @@ export default function KakaoMap() {
     }
   }, [newMapRef, mapRef])
 
-  // 사용자 정보가 있으면 핀 로드
+  // 탭 전환 후 맵이 다시 표시될 때 컨테이너 크기 재계산
   useEffect(() => {
-    if (isLoaded && user) {
-      loadPins(user.id)
+    if (activeTab === 'map' && mapRef.current) {
+      mapRef.current.relayout()
     }
-  }, [isLoaded, user, loadPins])
+  }, [activeTab, mapRef])
 
   // 지도 클릭 이벤트 등록
   useEffect(() => {
@@ -38,8 +35,6 @@ export default function KakaoMap() {
       const latlng = mouseEvent.latLng
       const lat = latlng.getLat()
       const lng = latlng.getLng()
-
-      setSelectedLocation({ lat, lng })
 
       // 기존 마커 제거
       if (markerRef.current) {

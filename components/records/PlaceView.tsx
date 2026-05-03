@@ -1,53 +1,80 @@
 'use client'
 
-import type { TravelRecord, Stop } from '@/types/index'
+import { useUI } from '@/contexts/UIContext'
+import type { TravelRecord } from '@/types/index'
 import styles from '@/styles/memories.module.css'
 
 interface PlaceViewProps {
   records: TravelRecord[]
 }
 
-// 주소에서 도시 추출 (간단한 버전)
 function extractCity(placeTag: string): string {
-  // "서울 강남구" 형태에서 첫 번째 부분 추출
-  const parts = placeTag.split(' ')
-  return parts[0] || '기타'
+  if (!placeTag) return '기타'
+  const m = placeTag.match(/[가-힣]+(특별시|광역시|특별자치시|시)/)
+  return m ? m[0] : '기타'
 }
 
 export default function PlaceView({ records }: PlaceViewProps) {
-  // 도시별로 stops 그룹핑
-  const placeGroups = new Map<string, Stop[]>()
+  const { openPinDetail } = useUI()
 
+  const cityGroups = new Map<string, TravelRecord[]>()
   records.forEach((record) => {
-    record.stops.forEach((stop) => {
-      const city = extractCity(stop.placeTag)
-      if (!placeGroups.has(city)) {
-        placeGroups.set(city, [])
-      }
-      placeGroups.get(city)?.push(stop)
-    })
+    const primaryPlace = record.stops[0]?.placeTag || ''
+    const city = extractCity(primaryPlace)
+    if (!cityGroups.has(city)) cityGroups.set(city, [])
+    cityGroups.get(city)!.push(record)
   })
 
-  const sortedPlaces = Array.from(placeGroups.entries())
-    .sort(([cityA], [cityB]) => cityA.localeCompare(cityB))
+  const sortedCities = Array.from(cityGroups.entries()).sort(([a], [b]) => {
+    if (a === '기타') return 1
+    if (b === '기타') return -1
+    return a.localeCompare(b, 'ko')
+  })
 
-  if (sortedPlaces.length === 0) {
-    return <div className={styles.placeViewEmpty}>방문한 장소가 없습니다.</div>
+  if (sortedCities.length === 0) {
+    return <p className={styles.memoriesEmptyHint}>방문한 장소가 없습니다.</p>
   }
 
   return (
-    <div className={styles.placeViewContainer}>
-      {sortedPlaces.map(([city, stops]) => (
-        <div key={city} className={styles.placeGroup}>
-          <h3 className={styles.placeGroupTitle}>{city}</h3>
-          <ul className={styles.placeGroupList}>
-            {stops.map((stop) => (
-              <li key={stop.id} className={styles.placeItem}>
-                <span className={styles.placeItemName}>{stop.placeTag}</span>
-                <span className={styles.placeItemMemo}>{stop.memo}</span>
-              </li>
-            ))}
-          </ul>
+    <div className={styles.memoriesTimeline}>
+      {sortedCities.map(([city, cityRecords]) => (
+        <div key={city} className={styles.memoriesTimelineGroup}>
+          <div className={styles.memoriesTimelineDate}>
+            <span className={styles.memoriesTimelineDateLabel}>{city}</span>
+            <div className={styles.memoriesTimelineDateLine} />
+          </div>
+          <div className={styles.memoriesTimelineItems}>
+            {cityRecords.map((record) => {
+              const firstStop = record.stops[0]
+              const thumb = firstStop?.photoDataUrl
+              const label = record.title || firstStop?.placeTag || '기록'
+              const desc = firstStop?.memo || ''
+              return (
+                <div
+                  key={record.id}
+                  className={styles.memoriesTimelineItem}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => openPinDetail(record.id)}
+                >
+                  {thumb ? (
+                    <img
+                      className={styles.memoriesTimelineItemThumb}
+                      src={thumb}
+                      alt="기록 사진"
+                    />
+                  ) : (
+                    <div className={styles.memoriesTimelineItemThumbEmpty}>📍</div>
+                  )}
+                  <div className={styles.memoriesTimelineItemBody}>
+                    <div className={styles.memoriesTimelineItemPlace}>{label}</div>
+                    <div className={styles.memoriesTimelineItemMemo}>
+                      {record.date}{desc ? ` · ${desc}` : ''}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       ))}
     </div>

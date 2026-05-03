@@ -2,63 +2,97 @@
 
 import { useMap } from '@/contexts/MapContext'
 import { useUI } from '@/contexts/UIContext'
-import { getWeatherInfo } from '@/lib/weather'
+import { useAuth } from '@/contexts/AuthContext'
+import { deleteRecord } from '@/app/actions/records'
 import styles from '@/styles/modals.module.css'
 
 export default function PinDetailModal() {
-  const { pins } = useMap()
-  const { openModal, activePinId, closeModal, openRecordModal } = useUI()
+  const { records, loadPins } = useMap()
+  const { openModal, activeRecordId, closeModal, openRecordModal } = useUI()
+  const { user } = useAuth()
 
-  if (openModal !== 'pinDetail' || !activePinId) {
-    return null
+  if (openModal !== 'pinDetail' || !activeRecordId) return null
+
+  const record = records.find((r) => r.id === activeRecordId)
+  if (!record) return null
+
+  const firstStopWithPhoto = record.stops.find((s) => s.photoDataUrl)
+
+  const handleDelete = async () => {
+    if (!confirm('이 기록을 삭제할까요?')) return
+    const { error } = await deleteRecord(record.id)
+    if (!error && user) {
+      await loadPins(user.id)
+    }
+    closeModal()
   }
 
-  const pin = pins.find((p) => p.id === activePinId)
-
-  if (!pin) {
-    return null
+  const handleEdit = () => {
+    openRecordModal(record)
   }
-
-  // TODO: weather 정보 가져오기
-  const weatherInfo = { emoji: '❓', description: '날씨 정보 없음' }
 
   return (
-    <div className={styles.modalOverlay} onClick={closeModal}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>{pin.title}</h2>
-          <button className={styles.modalClose} onClick={closeModal}>
-            ✕
-          </button>
-        </div>
+    <div className={styles.pinDetailModal} onClick={closeModal}>
+      <div className={styles.pinDetailModalBackdrop} />
+      <div className={styles.pinDetailModalContent} onClick={(e) => e.stopPropagation()}>
+        {firstStopWithPhoto ? (
+          <img
+            className={styles.pinDetailModalPhoto}
+            src={firstStopWithPhoto.photoDataUrl}
+            alt="기록 사진"
+          />
+        ) : (
+          <div className={styles.pinDetailModalPhotoEmpty}>📍</div>
+        )}
 
-        <div className={styles.modalBody}>
-          <div className={styles.pinDetailDate}>{pin.date}</div>
-
-          <div className={styles.pinDetailWeather}>
-            <span className={styles.weatherEmoji}>{weatherInfo.emoji}</span>
-            <span className={styles.weatherDesc}>{weatherInfo.description}</span>
+        <div className={styles.pinDetailModalBody}>
+          <div className={styles.pinDetailModalHeader}>
+            <div style={{ minWidth: 0 }}>
+              <h2 className={styles.pinDetailModalPlace}>
+                {record.title || record.stops[0]?.placeTag || '기록'}
+              </h2>
+              <span className={styles.pinDetailModalDate}>{record.date}</span>
+            </div>
+            <button className={styles.pinDetailModalClose} onClick={closeModal}>
+              ✕
+            </button>
           </div>
 
-          {/* TODO: stops 타임라인 렌더링 */}
+          {record.weather && (
+            <div className={styles.weatherBadge}>
+              <span className={styles.weatherBadgeIcon}>{record.weather.emoji}</span>
+              {record.weather.description}
+            </div>
+          )}
 
-          <div className={styles.modalActions}>
-            <button
-              className={styles.modalBtn}
-              onClick={() => {
-                openRecordModal()
-                closeModal()
-              }}
-            >
+          <div className={styles.pinDetailStops}>
+            {record.stops.map((stop) => (
+              <div key={stop.id} className={styles.pinDetailStop}>
+                <div className={styles.pinDetailStopTime}>{stop.time || ''}</div>
+                <div className={styles.pinDetailStopBody}>
+                  <div className={styles.pinDetailStopPlace}>
+                    {stop.placeTag || '장소 미지정'}
+                  </div>
+                  {stop.memo && (
+                    <div className={styles.pinDetailStopMemo}>{stop.memo}</div>
+                  )}
+                  {stop.photoDataUrl && (
+                    <img
+                      className={styles.pinDetailStopPhoto}
+                      src={stop.photoDataUrl}
+                      alt="사진"
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.memoryCardActions}>
+            <button className={styles.btnEditRecord} onClick={handleEdit}>
               수정
             </button>
-            <button
-              className={`${styles.modalBtn} ${styles.modalBtnDanger}`}
-              onClick={() => {
-                // TODO: deleteRecord
-                closeModal()
-              }}
-            >
+            <button className={styles.btnDeleteRecord} onClick={handleDelete}>
               삭제
             </button>
           </div>

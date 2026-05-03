@@ -1,12 +1,14 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useEffect } from 'react'
 import { AuthOverlay } from '@/components/auth/AuthOverlay'
 import SiteHeader from '@/components/layout/SiteHeader'
 import { UIProvider } from '@/contexts/UIContext'
 import { MapProvider } from '@/contexts/MapContext'
 import { useUI } from '@/contexts/UIContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useMap } from '@/contexts/MapContext'
 import RecordModal from '@/components/records/RecordModal'
 import PinDetailModal from '@/components/map/PinDetailModal'
 import CoupleModal from '@/components/couple/CoupleModal'
@@ -22,8 +24,16 @@ const MemoriesPanel = dynamic(() => import('@/components/records/MemoriesPanel')
 })
 
 function PageContent() {
-  const { activeTab } = useUI()
+  const { activeTab, openModal, editingRecord } = useUI()
   const { user } = useAuth()
+  const { loadPins } = useMap()
+
+  // 로그인하면 records 로드
+  useEffect(() => {
+    if (user) {
+      loadPins(user.id)
+    }
+  }, [user, loadPins])
 
   if (!user) {
     return <AuthOverlay />
@@ -57,8 +67,8 @@ function PageContent() {
         <MemoriesPanel />
       </div>
 
-      {/* 모달들 */}
-      <RecordModal />
+      {/* 모달들 - key로 편집 대상이 바뀔 때마다 state 리셋 */}
+      <RecordModal key={`${openModal}-${editingRecord?.id ?? 'new'}`} />
       <PinDetailModal />
       <CoupleModal />
     </>

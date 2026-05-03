@@ -16,102 +16,42 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+function toProfile(sessionUser: any): UserProfile {
+  return {
+    id: sessionUser.id,
+    email: sessionUser.email || '',
+    nickname:
+      sessionUser.user_metadata?.nickname ||
+      sessionUser.email?.split('@')[0] ||
+      'User',
+    created_at: sessionUser.created_at || new Date().toISOString(),
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
 
-    // 현재 세션 가져오기
-    const getSession = async () => {
-      try {
-        const {
-          data: { session: currentSession },
-        } = await supabase.auth.getSession()
-
+    // 콜백을 동기로 유지 — 비동기 DB 쿼리를 여기서 실행하면
+    // React Strict Mode의 이중 실행 + cleanup 타이밍에 의해 auth lock 경쟁 발생
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (_event: any, currentSession: any) => {
         if (currentSession) {
           setSession(currentSession as Session)
-
-          // 사용자 정보 가져오기
-          const { data: profile, error: profileError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', currentSession.user.id)
-            .single()
-
-          if (profileError) {
-            console.error('프로필 조회 오류:', profileError)
-            setError(profileError.message)
-          } else {
-            setUser(profile)
-          }
+          setUser(toProfile(currentSession.user))
+        } else {
+          setSession(null)
+          setUser(null)
         }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류'
-        setError(errorMessage)
-      } finally {
         setLoading(false)
       }
-    }
-
-    getSession()
-
-    // 인증 상태 변경 구독
-    const {
-      data: { subscription },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } = supabase.auth.onAuthStateChange(async (_event: any, currentSession: any) => {
-      if (currentSession) {
-        setSession(currentSession as Session)
-
-        try {
-          const { data: profile, error: profileError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', currentSession.user.id)
-            .single()
-
-          if (profileError) {
-            console.error('프로필 조회 오류:', profileError)
-            // 프로필이 없으면 자동 생성
-            const { error: insertError } = await supabase.from('users').insert({
-              id: currentSession.user.id,
-              email: currentSession.user.email,
-              nickname: currentSession.user.user_metadata?.nickname || 'User',
-              avatar_url: null,
-              created_at: new Date().toISOString(),
-            })
-
-            if (insertError) {
-              console.error('프로필 자동 생성 실패:', insertError)
-              return
-            }
-
-            // 프로필 재조회
-            const { data: newProfile } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', currentSession.user.id)
-              .single()
-
-            if (newProfile) {
-              setUser(newProfile)
-            }
-          } else if (profile) {
-            console.log('로그인 프로필:', JSON.stringify(profile))
-            setUser(profile)
-          }
-        } catch (err) {
-          console.error('프로필 처리 예외:', err)
-        }
-      } else {
-        setSession(null)
-        setUser(null)
-      }
-    })
+    )
 
     return () => {
       subscription?.unsubscribe()
@@ -119,58 +59,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signIn = async (email: string, password: string): Promise<{ error?: string }> => {
-    console.log('signIn 시작:', email)
-
     try {
-      // 서버 액션으로 로그인 + 프로필 조회 수행
       const result = await serverSignIn(email, password)
 
       if (result.error) {
-        console.error('signIn 오류:', result.error)
         return { error: result.error }
       }
 
-      console.log('signIn 성공')
-
-      // 서버에서 받은 session과 profile 설정
       const currentSession = result.data?.session
-      const profile = result.profile
-
       if (!currentSession) {
         return { error: '로그인 실패' }
       }
 
       setSession(currentSession as Session)
-
-      if (profile) {
-        console.log('프로필 설정 완료')
-        setUser(profile)
-      }
+      setUser(result.profile ?? toProfile(currentSession.user))
 
       return {}
     } catch (err) {
-      console.error('signIn 예외:', err)
       return { error: err instanceof Error ? err.message : '알 수 없는 오류' }
     }
   }
 
   const signOut = async () => {
     try {
-      console.log('signOut: 서버 액션 호출 중...')
-      const result = await serverSignOut()
-
-      if (result.error) {
-        console.error('signOut: 오류:', result.error)
-      } else {
-        console.log('signOut: 서버 로그아웃 성공')
-      }
-
-      // 상태 초기화
+      await serverSignOut()
+    } catch (err) {
+      console.error('signOut 예외:', err)
+    } finally {
       setUser(null)
       setSession(null)
-      console.log('signOut: 완료')
-    } catch (err) {
-      console.error('signOut: 예외 발생:', err)
     }
   }
 

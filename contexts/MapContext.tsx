@@ -1,11 +1,13 @@
 'use client'
 
 import { createContext, useContext, useRef, useState, useCallback } from 'react'
-import type { Pin } from '@/types/index'
+import { getRecords } from '@/app/actions/records'
+import type { Pin, TravelRecord } from '@/types/index'
 
 interface MapContextType {
   pins: Pin[]
   setPins: (pins: Pin[]) => void
+  records: TravelRecord[]
   mapRef: React.RefObject<any>
   overlaysRef: React.RefObject<Record<string, any>>
   loadPins: (userId: string) => Promise<void>
@@ -19,6 +21,7 @@ const MapContext = createContext<MapContextType | undefined>(undefined)
 
 export function MapProvider({ children }: { children: React.ReactNode }) {
   const [pins, setPins] = useState<Pin[]>([])
+  const [records, setRecords] = useState<TravelRecord[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const mapRef = useRef<any>(null)
@@ -28,13 +31,34 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true)
       setError(null)
-      // TODO: Supabase에서 pins 로드
-      // const { data, error } = await supabase
-      //   .from('records')
-      //   .select('*')
-      //   .eq('user_id', userId)
-      // 
-      // 이를 Pin[] 형태로 변환
+
+      const { data: loadedRecords, error: fetchError } = await getRecords(userId)
+
+      if (fetchError) {
+        setError(fetchError)
+        return
+      }
+
+      setRecords(loadedRecords)
+
+      // stops에서 Pin 목록 생성
+      const derivedPins: Pin[] = []
+      for (const record of loadedRecords) {
+        for (const stop of record.stops || []) {
+          if (stop.lat && stop.lng) {
+            derivedPins.push({
+              id: stop.id,
+              lat: stop.lat,
+              lng: stop.lng,
+              title: stop.placeTag,
+              date: record.date,
+              recordId: record.id,
+              stopId: stop.id,
+            })
+          }
+        }
+      }
+      setPins(derivedPins)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '핀 로드 실패'
       setError(errorMessage)
@@ -43,12 +67,12 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const addPinToMap = useCallback((pin: Pin) => {
-    // TODO: 지도에 핀 추가 (CustomOverlay)
+  const addPinToMap = useCallback((_pin: Pin) => {
+    // KakaoMap 컴포넌트에서 pins 배열 변경을 감지해 처리
   }, [])
 
-  const removePinFromMap = useCallback((pinId: string) => {
-    // TODO: 지도에서 핀 제거
+  const removePinFromMap = useCallback((_pinId: string) => {
+    // KakaoMap 컴포넌트에서 pins 배열 변경을 감지해 처리
   }, [])
 
   return (
@@ -56,6 +80,7 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
       value={{
         pins,
         setPins,
+        records,
         mapRef,
         overlaysRef,
         loadPins,

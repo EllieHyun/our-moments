@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState } from 'react'
+import type { TravelRecord } from '@/types/index'
 
 type ActiveTab = 'map' | 'memories'
 type ModalType = 'record' | 'couple' | 'pinDetail' | null
@@ -9,11 +10,12 @@ interface UIContextType {
   activeTab: ActiveTab
   setActiveTab: (tab: ActiveTab) => void
   openModal: ModalType
-  openRecordModal: () => void
+  openRecordModal: (record?: TravelRecord) => void
   openCoupleModal: () => void
-  openPinDetail: (pinId: string) => void
+  openPinDetail: (recordId: string) => void
   closeModal: () => void
-  activePinId: string | null
+  activeRecordId: string | null
+  editingRecord: TravelRecord | null
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined)
@@ -21,17 +23,22 @@ const UIContext = createContext<UIContextType | undefined>(undefined)
 export function UIProvider({ children }: { children: React.ReactNode }) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('map')
   const [openModal, setOpenModal] = useState<ModalType>(null)
-  const [activePinId, setActivePinId] = useState<string | null>(null)
+  const [activeRecordId, setActiveRecordId] = useState<string | null>(null)
+  const [editingRecord, setEditingRecord] = useState<TravelRecord | null>(null)
 
-  const openRecordModal = () => setOpenModal('record')
+  const openRecordModal = (record?: TravelRecord) => {
+    setEditingRecord(record ?? null)
+    setOpenModal('record')
+  }
   const openCoupleModal = () => setOpenModal('couple')
-  const openPinDetail = (pinId: string) => {
-    setActivePinId(pinId)
+  const openPinDetail = (recordId: string) => {
+    setActiveRecordId(recordId)
     setOpenModal('pinDetail')
   }
   const closeModal = () => {
     setOpenModal(null)
-    setActivePinId(null)
+    setActiveRecordId(null)
+    setEditingRecord(null)
   }
 
   return (
@@ -44,7 +51,8 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
         openCoupleModal,
         openPinDetail,
         closeModal,
-        activePinId,
+        activeRecordId,
+        editingRecord,
       }}
     >
       {children}

@@ -141,3 +141,66 @@
 #panelMemories {
   overflow-y: auto;
 }
+
+/* ===== 추억 패널 래퍼 ===== */
+.memoriesPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px clamp(16px, 4vw, 24px) 80px;
+  box-sizing: border-box;
+}
+
+.memoriesPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.memoriesPanelTitle {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.memoriesPanelContent {
+  width: 100%;
+  max-width: 400px;
+}
+
+.memoriesPanelEmpty {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  text-align: center;
+  padding: 40px 0;
+}
+
+.btnNewRecord {
+  padding: 7px 14px;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #faf8f4;
+  background: var(--accent-strong);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btnNewRecord:hover {
+  background: #3d3a36;
+}
