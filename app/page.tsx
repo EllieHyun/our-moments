@@ -33,13 +33,26 @@ function PageContent() {
     <>
       <SiteHeader />
 
-      <div id="panel-map" style={{ display: activeTab === 'map' ? 'block' : 'none' }}>
+      <div
+        id="panel-map"
+        style={{
+          display: activeTab === 'map' ? 'flex' : 'none',
+          flex: 1,
+          minHeight: 0,
+          width: '100%',
+        }}
+      >
         <KakaoMap />
       </div>
 
       <div
         id="panel-memories"
-        style={{ display: activeTab === 'memories' ? 'block' : 'none' }}
+        style={{
+          display: activeTab === 'memories' ? 'flex' : 'none',
+          flex: 1,
+          minHeight: 0,
+          width: '100%',
+        }}
       >
         <MemoriesPanel />
       </div>

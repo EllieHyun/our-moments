@@ -40,9 +40,19 @@ export function useKakaoMap(containerRef: React.RefObject<HTMLDivElement | null>
                   const lng = position.coords.longitude
                   const center = new window.kakao.maps.LatLng(lat, lng)
                   map.setCenter(center)
+
+                  // 현재 위치에 마커 추가
+                  const marker = new window.kakao.maps.Marker({
+                    position: center,
+                    map: map,
+                    title: '내 위치',
+                  })
+
+                  console.log('현재 위치 마커 생성:', { lat, lng })
                 },
                 () => {
                   // 기본값 사용 (서울)
+                  console.log('위치 권한 거부됨, 기본값(서울)으로 설정')
                 }
               )
             }

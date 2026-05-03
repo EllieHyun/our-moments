@@ -12,6 +12,10 @@ declare global {
         Marker: new (options: any) => any
         CustomOverlay: new (options: any) => any
         PolyLine: new (options: any) => any
+        event: {
+          addListener: (target: any, event: string, callback: any) => void
+          removeListener: (target: any, event: string, callback: any) => void
+        }
         services: {
           Places: new () => any
           Geocoder: new () => any

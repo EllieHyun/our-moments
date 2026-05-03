@@ -10,7 +10,13 @@ export default function SiteHeader() {
   const { openCoupleModal } = useUI()
 
   const handleLogout = async () => {
-    await signOut()
+    try {
+      console.log('로그아웃 시작...')
+      await signOut()
+      console.log('로그아웃 완료')
+    } catch (err) {
+      console.error('로그아웃 오류:', err)
+    }
   }
 
   return (

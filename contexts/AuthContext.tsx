@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { signIn as serverSignIn } from '@/app/actions/auth'
+import { signIn as serverSignIn, signOut as serverSignOut } from '@/app/actions/auth'
 import type { UserProfile, Session } from '@/types/index'
 
 interface AuthContextType {
@@ -155,10 +155,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    setUser(null)
-    setSession(null)
+    try {
+      console.log('signOut: 서버 액션 호출 중...')
+      const result = await serverSignOut()
+
+      if (result.error) {
+        console.error('signOut: 오류:', result.error)
+      } else {
+        console.log('signOut: 서버 로그아웃 성공')
+      }
+
+      // 상태 초기화
+      setUser(null)
+      setSession(null)
+      console.log('signOut: 완료')
+    } catch (err) {
+      console.error('signOut: 예외 발생:', err)
+    }
   }
 
   return (
