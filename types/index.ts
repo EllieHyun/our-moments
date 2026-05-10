@@ -54,8 +54,8 @@ export interface Pin {
 export interface CoupleConnection {
   id: string
   user_id_1: string
-  user_id_2: string
-  invite_code: string
+  user_id_2?: string
+  invite_code: string | null
   created_at: string
   connected_at?: string
 }

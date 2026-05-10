@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { UserProfile } from '@/types/index'
 import { useUI } from '@/contexts/UIContext'
 import { useAuth } from '@/contexts/AuthContext'
 import {
@@ -15,8 +16,8 @@ import formStyles from '@/styles/forms.module.css'
 export default function CoupleModal() {
   const { openModal, closeModal } = useUI()
   const { user } = useAuth()
-  const [mode, setMode] = useState<'view' | 'create' | 'join'>('view')
-  const [partner, setPartner] = useState<any>(null)
+  const [mode, setMode] = useState<'view' | 'join'>('view')
+  const [partner, setPartner] = useState<UserProfile | null>(null)
   const [connected, setConnected] = useState(false)
   const [inviteCode, setInviteCode] = useState<string | null>(null)
   const [joinCode, setJoinCode] = useState('')
@@ -61,7 +62,9 @@ export default function CoupleModal() {
       }
 
       setInviteCode(code)
-      setMode('view')
+    } catch (err) {
+      console.error('초대 코드 생성 중 에러:', err)
+      setError(err instanceof Error ? err.message : '초대 코드 생성 실패')
     } finally {
       setLoading(false)
     }
@@ -82,16 +85,21 @@ export default function CoupleModal() {
         return
       }
 
+      console.log('커플 연결 시도:', { userId: user.id, joinCode })
       const { error: joinError } = await connectCouple(user.id, joinCode)
+      console.log('커플 연결 결과:', { joinError })
 
       if (joinError) {
         setError(joinError)
         return
       }
 
+      // 파트너 정보 다시 로드
+      const { partner: partnerData, connected: isConnected } = await getPartnerInfo(user.id)
+      setPartner(partnerData)
+      setConnected(isConnected)
       setJoinCode('')
       setMode('view')
-      // TODO: 파트너 정보 다시 로드
     } finally {
       setLoading(false)
     }
@@ -154,16 +162,34 @@ export default function CoupleModal() {
                     연결 해제
                   </button>
                 </div>
+              ) : inviteCode ? (
+                <div className={styles.coupleInviteCode}>
+                  <p>초대 코드를 파트너에게 공유하세요:</p>
+                  <code className={styles.coupleInviteCodeValue}>{inviteCode}</code>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(inviteCode)}
+                    className={styles.coupleInviteCodeCopy}
+                  >
+                    복사
+                  </button>
+                  <button
+                    onClick={() => setInviteCode(null)}
+                    className={styles.coupledBtnSecondary}
+                    style={{ marginTop: '12px', width: '100%' }}
+                  >
+                    돌아가기
+                  </button>
+                </div>
               ) : (
                 <div className={styles.coupleNotConnected}>
                   <p>아직 파트너와 연결되지 않았습니다.</p>
                   <div className={styles.coupledBtnGroup}>
                     <button
                       className={styles.coupleBtn}
-                      onClick={() => setMode('create')}
+                      onClick={handleCreateInvite}
                       disabled={loading}
                     >
-                      초대 코드 생성
+                      {loading ? '생성 중...' : '초대 코드 생성'}
                     </button>
                     <button
                       className={styles.coupleBtn}
@@ -173,43 +199,11 @@ export default function CoupleModal() {
                       초대 코드 입력
                     </button>
                   </div>
-
-                  {inviteCode && (
-                    <div className={styles.coupleInviteCode}>
-                      <p>초대 코드를 파트너에게 공유하세요:</p>
-                      <code className={styles.coupleInviteCodeValue}>{inviteCode}</code>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(inviteCode)}
-                        className={styles.coupleInviteCodeCopy}
-                      >
-                        복사
-                      </button>
-                    </div>
-                  )}
                 </div>
               )}
             </>
           )}
 
-          {mode === 'create' && (
-            <div className={styles.coupleCreateForm}>
-              <p>파트너와 공유할 초대 코드를 생성합니다.</p>
-              <button
-                className={styles.coupleBtn}
-                onClick={handleCreateInvite}
-                disabled={loading}
-              >
-                {loading ? '생성 중...' : '초대 코드 생성'}
-              </button>
-              <button
-                className={styles.coupledBtnSecondary}
-                onClick={() => setMode('view')}
-                disabled={loading}
-              >
-                취소
-              </button>
-            </div>
-          )}
 
           {mode === 'join' && (
             <div className={styles.coupleJoinForm}>
